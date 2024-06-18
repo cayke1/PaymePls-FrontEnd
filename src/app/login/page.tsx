@@ -1,6 +1,5 @@
 "use client";
-import { use, useContext, useEffect } from "react";
-// import { AuthContext } from "../contexts/Auth/AuthContext";
+import { useContext, useEffect } from "react";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,9 +13,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import { useRedirect } from "../hooks/useRedirect";
-// import { Events } from "../contexts/Alert/Events.enum"
-// import { AlertContext } from "../contexts/Alert/AlertContext";
+import { Events } from "../contexts/alert/Events.enum";
+import { AlertContext } from "../contexts/alert/AlertContext";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -25,9 +23,9 @@ const LoginSchema = z.object({
 
 type LoginSchemaType = z.infer<typeof LoginSchema>;
 export default function Login() {
+  const { getEvent, alertEvent } = useContext(AlertContext);
   //const { to } = useRedirect();
   //   const auth = useContext(AuthContext);
-  //   const alert = useContext(AlertContext);
   const {
     register,
     handleSubmit,
@@ -37,13 +35,14 @@ export default function Login() {
   });
 
   useEffect(() => {
-    // const event = alert.getEvent();
-    // if (event) {
-    //   alert.alertEvent(event);
-    // }
+    const event = getEvent();
+    if (event) {
+      alertEvent(event);
+    }
   });
 
   const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
+    alertEvent(Events.loggedIn);
     console.log(data);
     // const isUserLogged = await auth.signin(data.email, data.password);
     // if (!isUserLogged) {
