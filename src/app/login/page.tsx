@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Events } from "../contexts/alert/Events.enum";
 import { AlertContext } from "../contexts/alert/AlertContext";
+import { AuthContext } from "../contexts/auth/AuthContext";
+import { useRedirect } from "../hooks/useRedirect";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -24,8 +26,8 @@ const LoginSchema = z.object({
 type LoginSchemaType = z.infer<typeof LoginSchema>;
 export default function Login() {
   const { getEvent, alertEvent } = useContext(AlertContext);
-  //const { to } = useRedirect();
-  //   const auth = useContext(AuthContext);
+  const { to } = useRedirect();
+  const auth = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -42,15 +44,13 @@ export default function Login() {
   });
 
   const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
-    alertEvent(Events.loggedIn);
-    console.log(data);
-    // const isUserLogged = await auth.signin(data.email, data.password);
-    // if (!isUserLogged) {
-    //   alert.alertEvent(Events.invalidCredentials);
-    // }
-    // if (isUserLogged) {
-    //   to("/dashboard/pdv");
-    // }
+    const isUserLogged = await auth.signin(data.email, data.password);
+    if (!isUserLogged) {
+      alertEvent(Events.invalidCredentials);
+    }
+    if (isUserLogged) {
+      to("/dashboard");
+    }
   };
   return (
     <div className="flex items-center justify-center h-screen">

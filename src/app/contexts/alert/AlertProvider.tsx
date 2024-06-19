@@ -8,7 +8,19 @@ const alerts: {[key: string]: any} = {
   loggedIn: {
     icon: "success",
     title: "Bem vindo!",
-  }
+  },
+  sessionExpired: {
+    icon: "warning",
+    title: "Sessão expirada",
+  },
+  loggedOut: {
+    icon: "info",
+    title: "Deslogado",
+  },
+  invalidCredentials: {
+    icon: "error",
+    title: "Credenciais inválidas",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
