@@ -16,6 +16,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signin = async (email: string, password: string) => {
     try {
       const data = await api.signIn({ email, password });
+      console.log(data)
+      if (!data.token) return false;
       persistToken(data.token);
       setToken(data.token);
       registerEvent(Events.loggedIn);

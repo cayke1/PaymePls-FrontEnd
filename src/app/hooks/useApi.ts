@@ -20,11 +20,10 @@ export const useApi = () => ({
   signIn: async (data: { email: string; password: string }) => {
     try {
       const response = await api.post("/login", data);
-      localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error) {
       console.log(error);
-      return error;
+      throw error;
     }
   },
 
@@ -39,17 +38,12 @@ export const useApi = () => ({
   },
 
   checkToken: async () => {
-    try {
-      const response = await api.get("/verify", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
+    const response = await api.get("/verify", {
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data;
   },
 
   registerDebtor: async (data: {

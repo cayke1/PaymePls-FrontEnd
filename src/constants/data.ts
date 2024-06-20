@@ -33,9 +33,15 @@ export const navItems: NavItem[] = [
     label: 'user'
   },
   {
-    title: 'Login',
-    href: '/',
+    title: 'Bills',
+    href: '/dashboard/bills',
+    icon: 'billing',
+    label: 'billing'
+  },
+  {
+    title: 'Logout',
+    href: '/logout',
     icon: 'login',
-    label: 'login'
+    label: 'logout'
   }
 ];
