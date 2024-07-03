@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
 import { CheckCircle, LoaderCircle, X, XCircle } from "lucide-react";
 import { Debtor } from "@/app/@types/debtor";
@@ -25,8 +25,12 @@ import { Bill } from "@/app/@types/bill";
 import { priceFormatter } from "@/app/utils/priceFormatter";
 import { dateFormatter } from "@/app/utils/dateFormatter";
 import { Button } from "@/components/ui/button";
+import { AlertContext } from "@/app/contexts/alert/AlertContext";
+import { Events } from "@/app/contexts/alert/Events.enum";
+import { CreateBillModal } from "./components/CreateBillModal";
 
 export default function Bills() {
+  const alert = useContext(AlertContext);
   const [loading, setLoading] = useState(true);
   const [debtors, setDebtors] = useState([] as Debtor[]);
   const [selectedOption, setSelectedOption] = useState("");
@@ -47,13 +51,21 @@ export default function Bills() {
   const handleChangeValue = (value: any) => {
     setSelectedOption(value);
     const selected = debtors.find((debtor) => debtor.id === value);
-    if(selected)
-        setSelectedDebtor(selected);
+    if (selected) setSelectedDebtor(selected);
   };
 
   const findBills = async () => {
     const query_bills = await api.findBillsFromDebtor(selectedOption);
     setBills(query_bills);
+  };
+
+  const handleSetPaid = async (billId: string | undefined) => {
+    if (!billId) return console.error("Bill ID not found");
+    const response = await api.setBillPayd(billId);
+    if (response) {
+      alert.alertEvent(Events.billPaid);
+      findBills();
+    }
   };
   return loading ? (
     <ScrollArea className="px-4 py-2">
@@ -76,12 +88,16 @@ export default function Bills() {
 
           <SelectContent>
             <SelectGroup>
-              <SelectLabel value="none">Debtors</SelectLabel>
-              {debtors.map((debtor) => (
-                <SelectItem key={debtor.id} value={debtor.id}>
-                  {debtor.name}
-                </SelectItem>
-              ))}
+              <SelectLabel>Debtors</SelectLabel>
+              {debtors.length >= 1 ? (
+                debtors.map((debtor) => (
+                  <SelectItem key={debtor.id} value={debtor.id}>
+                    {debtor.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <div>Not found</div>
+              )}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -119,9 +135,14 @@ export default function Bills() {
                         <Button className="bg-gray-500 hover:bg-gray-700 text-white">
                           Edit
                         </Button>
-                        <Button className="bg-red-500 hover:bg-red-700 text-white">
-                          Delete
-                        </Button>
+                        {bill.active && (
+                          <Button
+                            onClick={() => handleSetPaid(bill.id)}
+                            className="bg-green-500 hover:bg-green-700 text-white"
+                          >
+                            Mark as Paid
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -133,14 +154,14 @@ export default function Bills() {
         <Card className="">
           <CardHeader>
             <CardTitle>New</CardTitle>
-            <CardDescription>Create new Bill for {selectedDebtor?.name}?</CardDescription>
+            <CardDescription>
+              Create new Bill for {selectedDebtor?.name}?
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-[80%]">
-                Create
-            </Button>
+            <CreateBillModal debtorId={selectedOption} />
           </CardContent>
-        </Card> 
+        </Card>
       </div>
     </ScrollArea>
   );

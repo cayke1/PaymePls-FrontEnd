@@ -21,6 +21,10 @@ const alerts: {[key: string]: any} = {
     icon: "error",
     title: "Credenciais inválidas",
   },
+  billPaid: {
+    icon: "success",
+    title: "Conta paga",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
