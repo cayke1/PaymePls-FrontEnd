@@ -4,4 +4,6 @@ export enum  Events {
     loggedOut = "loggedOut",
     invalidCredentials = "invalidCredentials",
     billPaid = "billPaid",
+    billCreated = "billCreated",
+    failedToCreateBill = "failedToCreateBill",
 }

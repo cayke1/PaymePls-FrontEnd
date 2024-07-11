@@ -92,7 +92,7 @@ export const useApi = () => ({
     }
   },
 
-  registerBill: async (data: Bill) => {
+  registerBill: async (data: Omit<Bill, "created_at" | "active">) => {
     try {
       const response = await api.post("/bill", data, {
         headers: {
@@ -135,12 +135,12 @@ export const useApi = () => ({
     }
   },
 
-  setBillPayd: async (billId: string) => {
+  setBillPaid: async (billId: string) => {
     const data = {
       date: new Date(),
     };
     try {
-      const response = await api.patch(`/bill/${billId}`, data, {
+      const response = await api.patch(`/bill/set_payd/${billId}`, data, {
         headers: {
           Authorization: token,
         },

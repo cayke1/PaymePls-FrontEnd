@@ -61,7 +61,7 @@ export default function Bills() {
 
   const handleSetPaid = async (billId: string | undefined) => {
     if (!billId) return console.error("Bill ID not found");
-    const response = await api.setBillPayd(billId);
+    const response = await api.setBillPaid(billId);
     if (response) {
       alert.alertEvent(Events.billPaid);
       findBills();

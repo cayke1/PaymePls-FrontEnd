@@ -15,15 +15,16 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useApi } from "@/app/hooks/useApi";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AlertContext } from "@/app/contexts/alert/AlertContext";
+import { Bill } from "@/app/@types/bill";
+import { Events } from "@/app/contexts/alert/Events.enum";
 
 interface CreateBillModalProps {
   debtorId: string | undefined;
 }
 const CreateBillSchema = z.object({
   description: z.string(),
-  value: z.string(),
   next_charge: z.string(),
 });
 
@@ -31,6 +32,7 @@ type CreateBillSchemaType = z.infer<typeof CreateBillSchema>;
 
 export function CreateBillModal({ debtorId }: CreateBillModalProps) {
   const alert = useContext(AlertContext);
+  const [valueInput, setValueInput] = useState<string>("");
   const {
     register,
     handleSubmit,
@@ -41,11 +43,18 @@ export function CreateBillModal({ debtorId }: CreateBillModalProps) {
   const api = useApi();
 
   const onSubmit = async (data: CreateBillSchemaType) => {
-    const newData = {
+    if(!debtorId) return;
+    const newData: Omit<Bill, "created_at" | "active"> = {
         ...data,
         next_charge: new Date(data.next_charge),
-        value: parseFloat(data.value),
+        value: parseFloat(valueInput.replace(/\./g, "").replace(",", ".")),
         debtorId,
+    }
+    try {
+      await api.registerBill(newData);
+      alert.alertEvent(Events.billCreated);
+    } catch (error) {
+      alert.alertEvent(Events.failedToCreateBill);
     }
   };
 
@@ -83,14 +92,10 @@ export function CreateBillModal({ debtorId }: CreateBillModalProps) {
                 <ValueInput
                   id="value"
                   type="number"
-                  defaultValue="100"
                   className="w-[100%]"
-                  {...register("value")}
+                  onChangeFunction={(e) => {setValueInput(e)}}
                 />
               </div>
-              {errors.value && (
-                <span className="text-red-500">{errors.value.message}</span>
-              )}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="next_charge" className="text-right">
