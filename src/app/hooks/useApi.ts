@@ -152,7 +152,7 @@ export const useApi = () => ({
     }
   },
 
-  updateBill: async (billId: string, data: Bill) => {
+  updateBill: async (billId: string, data: any) => {
     try {
       const response = await api.put(`/bill/${billId}`, data, {
         headers: {

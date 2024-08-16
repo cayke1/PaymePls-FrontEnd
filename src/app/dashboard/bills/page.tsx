@@ -28,6 +28,15 @@ import { Button } from "@/components/ui/button";
 import { AlertContext } from "@/app/contexts/alert/AlertContext";
 import { Events } from "@/app/contexts/alert/Events.enum";
 import { CreateBillModal } from "./components/CreateBillModal";
+import {
+  Table,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { EditBillModal } from "./components/EditBillModal";
 
 export default function Bills() {
   const alert = useContext(AlertContext);
@@ -59,14 +68,6 @@ export default function Bills() {
     setBills(query_bills);
   };
 
-  const handleSetPaid = async (billId: string | undefined) => {
-    if (!billId) return console.error("Bill ID not found");
-    const response = await api.setBillPaid(billId);
-    if (response) {
-      alert.alertEvent(Events.billPaid);
-      findBills();
-    }
-  };
   return loading ? (
     <ScrollArea className="px-4 py-2">
       <div className="h-[100vh] w-full items-center justify-center">
@@ -77,7 +78,7 @@ export default function Bills() {
     </ScrollArea>
   ) : (
     <ScrollArea className="px-4 py-2">
-      <div className="w-full">
+      <div className="w-full flex">
         <Select
           value={selectedOption ? selectedOption : undefined}
           onValueChange={(value: any) => handleChangeValue(value)}
@@ -91,7 +92,7 @@ export default function Bills() {
               <SelectLabel>Debtors</SelectLabel>
               {debtors.length >= 1 ? (
                 debtors.map((debtor) => (
-                  <SelectItem key={debtor.id} value={debtor.id}>
+                  <SelectItem key={debtor.id} value={debtor.id!}>
                     {debtor.name}
                   </SelectItem>
                 ))
@@ -101,67 +102,41 @@ export default function Bills() {
             </SelectGroup>
           </SelectContent>
         </Select>
+        <CreateBillModal debtorId={selectedOption} />
       </div>
 
       <div className="w-full flex justify-normal items-center gap-4 flex-wrap mt-10">
-        {bills.length
-          ? bills.map((bill) => (
-              <Card className="w-[350px]" key={bill.id}>
-                <CardHeader>
-                  <CardTitle>{priceFormatter(bill.value)}</CardTitle>
-                  <CardDescription>{bill.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Bill created at {dateFormatter(bill.created_at)}</p>
-                </CardContent>
-                <CardFooter>
-                  <div className="flex flex-col gap-8">
-                    <div className="flex flex-col justify-center gap-4">
-                      <h4 className="font-bold text-xl">Status</h4>
-                      {bill.active ? (
-                        <div title="Not paid">
-                          <XCircle className="text-red-500" />
-                        </div>
-                      ) : (
-                        <div title="Paid">
-                          <CheckCircle className="text-green-500" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-4 justify-center">
-                      <h4 className="font-bold text-xl">Actions</h4>
-                      <div className="flex gap-4">
-                        <Button className="bg-gray-500 hover:bg-gray-700 text-white">
-                          Edit
-                        </Button>
-                        {bill.active && (
-                          <Button
-                            onClick={() => handleSetPaid(bill.id)}
-                            className="bg-green-500 hover:bg-green-700 text-white"
-                          >
-                            Mark as Paid
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))
-          : ""}
-
-        <Card className="">
-          <CardHeader>
-            <CardTitle>New</CardTitle>
-            <CardDescription>
-              Create new Bill for {selectedDebtor?.name}?
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CreateBillModal debtorId={selectedOption} />
-          </CardContent>
-        </Card>
+        <Table>
+          <TableCaption>Invoices from {selectedDebtor?.name}</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Date</TableHead>
+              <TableHead className="max-w-[300px]">Description</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          {bills.length >= 1 &&
+            bills.map((bill) => (
+              <TableRow>
+                <TableCell>{dateFormatter(bill.created_at)}</TableCell>
+                <TableCell
+                  className="line-clamp-1 max-w-[300px]"
+                  title={bill.description}
+                >
+                  {bill.description}
+                </TableCell>
+                <TableCell className="text-right">
+                  {priceFormatter(bill.value)}
+                </TableCell>
+                <TableCell>{bill.active ? "Pending" : "Paid"}</TableCell>
+                <TableCell>
+                  <EditBillModal bill={bill}/>
+                </TableCell>
+              </TableRow>
+            ))}
+        </Table>
       </div>
     </ScrollArea>
   );

@@ -6,4 +6,5 @@ export enum  Events {
     billPaid = "billPaid",
     billCreated = "billCreated",
     failedToCreateBill = "failedToCreateBill",
+    billUpdated = "billUpdated",
 }

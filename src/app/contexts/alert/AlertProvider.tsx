@@ -33,6 +33,10 @@ const alerts: {[key: string]: any} = {
     icon: "error",
     title: "Falha ao criar conta",
   },
+  billUpdated: {
+    icon: "success",
+    title: "Conta atualizada",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {

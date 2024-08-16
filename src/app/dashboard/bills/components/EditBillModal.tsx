@@ -11,65 +11,72 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ValueInput } from "./ValueInput";
-import { z } from "zod";
+import { Bill } from "@/app/@types/bill";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useApi } from "@/app/hooks/useApi";
+import { z } from "zod";
 import { useContext, useState } from "react";
-import { AlertContext } from "@/app/contexts/alert/AlertContext";
-import { Bill } from "@/app/@types/bill";
 import { Events } from "@/app/contexts/alert/Events.enum";
+import { AlertContext } from "@/app/contexts/alert/AlertContext";
+import { useApi } from "@/app/hooks/useApi";
+import { format } from "date-fns";
 
-interface CreateBillModalProps {
-  debtorId: string | undefined;
-}
-const CreateBillSchema = z.object({
-  description: z.string(),
-  next_charge: z.string(),
+const EditBillSchema = z.object({
+  description: z.string().optional(),
+  next_charge: z.string().optional(),
 });
 
-type CreateBillSchemaType = z.infer<typeof CreateBillSchema>;
+type EditBillSchemaType = z.infer<typeof EditBillSchema>;
 
-export function CreateBillModal({ debtorId }: CreateBillModalProps) {
+export function EditBillModal({ bill }: { bill: Bill }) {
   const alert = useContext(AlertContext);
+  const api = useApi();
   const [valueInput, setValueInput] = useState<string>("");
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateBillSchemaType>({
-    resolver: zodResolver(CreateBillSchema),
+  } = useForm<EditBillSchemaType>({
+    resolver: zodResolver(EditBillSchema),
   });
-  const api = useApi();
 
-  const onSubmit = async (data: CreateBillSchemaType) => {
-    if(!debtorId) return;
-    const newData: Omit<Bill, "created_at" | "active"> = {
-        ...data,
-        next_charge: new Date(data.next_charge),
-        value: parseFloat(valueInput.replace(/\./g, "").replace(",", ".")),
-        debtorId,
-    }
-    try {
-      await api.registerBill(newData);
-      alert.alertEvent(Events.billCreated);
-    } catch (error) {
-      alert.alertEvent(Events.failedToCreateBill);
+  const onSubmit = async (data: EditBillSchemaType) => {
+    const newData = {
+      ...data,
+      next_charge: data.next_charge
+        ? new Date(data.next_charge)
+        : bill.next_charge,
+      value:
+        valueInput != ""
+          ? parseFloat(valueInput.replace(/\./g, "").replace(",", "."))
+          : bill.value,
+    };
+
+    const response = await api.updateBill(bill.id!, newData);
+    if (response) {
+      alert.alertEvent(Events.billUpdated);
     }
   };
 
-  return debtorId ? (
+  const handleSetPaid = async (billId: string | undefined) => {
+    if (!billId) return console.error("Bill ID not found");
+    const response = await api.setBillPaid(billId);
+    if (response) {
+      alert.alertEvent(Events.billPaid);
+    }
+  };
+  return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button>Create Bill</Button>
+      <DialogTrigger>
+        <Button className="bg-transparent hover:bg-transparent text-white">
+          Edit
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Create Bill</DialogTitle>
-            <DialogDescription>
-              Fill the form to create a new bill
-            </DialogDescription>
+            <DialogTitle>Edit Bill</DialogTitle>
+            <DialogDescription>Fill the form to edit bill</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -78,7 +85,7 @@ export function CreateBillModal({ debtorId }: CreateBillModalProps) {
               </Label>
               <Input
                 id="description"
-                defaultValue="Electricity Bill"
+                defaultValue={bill.description}
                 className="col-span-3"
                 {...register("description")}
               />
@@ -93,7 +100,10 @@ export function CreateBillModal({ debtorId }: CreateBillModalProps) {
                   id="value"
                   type="number"
                   className="w-[100%]"
-                  onChangeFunction={(e) => {setValueInput(e)}}
+                  onChangeFunction={(e) => {
+                    setValueInput(e);
+                  }}
+                  defaultValue={bill.value}
                 />
               </div>
             </div>
@@ -104,24 +114,25 @@ export function CreateBillModal({ debtorId }: CreateBillModalProps) {
               <Input
                 id="next_charge"
                 type="date"
-                defaultValue="2021-09-15"
+                defaultValue={format(bill.next_charge, "dd-MM-yyyy")}
                 className="col-span-3"
                 {...register("next_charge")}
               />
-              {errors.next_charge && (
-                <span className="text-red-500">
-                  {errors.next_charge.message}
-                </span>
-              )}
             </div>
           </div>
           <DialogFooter>
+            {bill.active && (
+              <Button
+                onClick={() => handleSetPaid(bill.id)}
+                className="bg-green-500 hover:bg-green-700 text-white"
+              >
+                Mark as Paid
+              </Button>
+            )}
             <Button type="submit">Save Bill</Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  ) : (
-    <Button disabled>Create Bill</Button>
   );
 }
