@@ -19,6 +19,7 @@ const api = axios.create({
 export const useApi = () => ({
   signIn: async (data: { email: string; password: string }) => {
     try {
+      console.log(process.env.NEXT_PUBLIC_API_URL);
       const response = await api.post("/login", data);
       return response.data;
     } catch (error) {
