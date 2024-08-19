@@ -11,22 +11,11 @@ import {
 } from "@/components/ui/select";
 import { useContext, useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
-import { CheckCircle, LoaderCircle, X, XCircle } from "lucide-react";
+import {LoaderCircle } from "lucide-react";
 import { Debtor } from "@/app/@types/debtor";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Bill } from "@/app/@types/bill";
 import { priceFormatter } from "@/app/utils/priceFormatter";
 import { dateFormatter } from "@/app/utils/dateFormatter";
-import { Button } from "@/components/ui/button";
-import { AlertContext } from "@/app/contexts/alert/AlertContext";
-import { Events } from "@/app/contexts/alert/Events.enum";
 import { CreateBillModal } from "./components/CreateBillModal";
 import {
   Table,
@@ -39,7 +28,6 @@ import {
 import { EditBillModal } from "./components/EditBillModal";
 
 export default function Bills() {
-  const alert = useContext(AlertContext);
   const [loading, setLoading] = useState(true);
   const [debtors, setDebtors] = useState([] as Debtor[]);
   const [selectedOption, setSelectedOption] = useState("");

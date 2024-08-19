@@ -11,13 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Trash } from "lucide-react";
+import { Eye, ReplyAll, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CreateDebtorModal } from "./CreateDebtorModal";
+import { useRedirect } from "@/app/hooks/useRedirect";
 
 export default function Debtors() {
   const [loading, setLoading] = useState(true);
   const [debtors, setDebtors] = useState([] as Debtor[]);
+  const redirect = useRedirect();
   const api = useApi();
   useEffect(() => {
     setLoading(true);
@@ -28,6 +30,10 @@ export default function Debtors() {
     if (loading) fetchData();
     setLoading(false);
   });
+
+  const handleRedirect = (id: string) => {
+    redirect.to(`/note/${id}`);
+  };
 
   return (
     <ScrollArea className="px-4 py-2">
@@ -50,7 +56,7 @@ export default function Debtors() {
               <TableCell>{debtor.phone}</TableCell>
               <TableCell>{debtor.email}</TableCell>
               <TableCell className="flex justify-start gap-4 p-1">
-                <Button className="p-1 bg-transparent text-purple-700">
+                <Button className="p-1 bg-transparent text-purple-700" onClick={() => handleRedirect(debtor.id!)}>
                   <Eye />
                 </Button>
                 <Button className="p-1 bg-transparent text-purple-700">

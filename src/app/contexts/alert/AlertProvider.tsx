@@ -45,6 +45,10 @@ const alerts: {[key: string]: any} = {
     icon: "error",
     title: "Falha ao criar devedor",
   },
+  failedToFetchBills: {
+    icon: "error",
+    title: "Falha ao buscar contas",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
