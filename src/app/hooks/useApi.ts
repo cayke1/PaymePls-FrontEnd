@@ -124,11 +124,7 @@ export const useApi = () => ({
 
   findBillsFromDebtor: async (debtorId: string) => {
     try {
-      const response = await api.get(`/bill/${debtorId}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await api.get(`/bill/${debtorId}`);
       return response.data;
     } catch (error) {
       console.log(error);
