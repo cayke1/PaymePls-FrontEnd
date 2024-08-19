@@ -37,6 +37,14 @@ const alerts: {[key: string]: any} = {
     icon: "success",
     title: "Conta atualizada",
   },
+  debtorCreated: {
+    icon: "success",
+    title: "Devedor criado",
+  },
+  failedToCreateDebtor: {
+    icon: "error",
+    title: "Falha ao criar devedor",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
