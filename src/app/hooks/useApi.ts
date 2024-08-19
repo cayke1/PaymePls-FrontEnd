@@ -93,6 +93,20 @@ export const useApi = () => ({
     }
   },
 
+  deleteDebtor: async (debtorId: string) => {
+    try {
+      const response = await api.delete(`/debtor/${debtorId}`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
+
   registerBill: async (data: Omit<Bill, "created_at" | "active">) => {
     try {
       const response = await api.post("/bill", data, {

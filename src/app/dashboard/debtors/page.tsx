@@ -15,6 +15,7 @@ import { Eye, ReplyAll, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CreateDebtorModal } from "./CreateDebtorModal";
 import { useRedirect } from "@/app/hooks/useRedirect";
+import { ConfirmDeleteDebtorModal } from "./ConfirmDeleteDebtorModal";
 
 export default function Debtors() {
   const [loading, setLoading] = useState(true);
@@ -59,9 +60,7 @@ export default function Debtors() {
                 <Button className="p-1 bg-transparent text-purple-700" onClick={() => handleRedirect(debtor.id!)}>
                   <Eye />
                 </Button>
-                <Button className="p-1 bg-transparent text-purple-700">
-                  <Trash />
-                </Button>
+                <ConfirmDeleteDebtorModal id={debtor.id!} />
               </TableCell>
             </TableRow>
           ))}
