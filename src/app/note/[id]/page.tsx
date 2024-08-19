@@ -56,8 +56,8 @@ export default function Page({ params }: { params: { id: string } }) {
       </div>
     </ScrollArea>
   ) : (
-    <ScrollArea className="px-4 py-2">
-      <div className="w-[60%] mx-auto border-2 px-1 py-2 flex justify-normal items-center gap-4 flex-wrap mt-10">
+    <ScrollArea className="md:px-4 py-2">
+      <div className=" w-full h-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-normal items-center gap-4 flex-wrap mt-10">
         <Table>
           <TableHeader>
             <TableRow>
