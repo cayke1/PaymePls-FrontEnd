@@ -1,6 +1,4 @@
 "use client";
-import Header from "@/components/layout/header";
-import Sidebar from "@/components/layout/sidebar";
 import { Overview } from "@/components/overview";
 import { RecentSales } from "@/components/recent-sales";
 import {
@@ -15,12 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/auth/AuthContext";
 import { useApi } from "../hooks/useApi";
-import { Debtor } from "@/constants/data";
-import { LoaderCircle, LoaderIcon } from "lucide-react";
+import { Debtor } from "../@types/debtor";
+import { LoaderCircle } from "lucide-react";
+import { Bill } from "../@types/bill";
+import { priceFormatter } from "../utils/priceFormatter";
+import { sumBills } from "../utils/sumBills";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [debtors, setDebtors] = useState([] as Promise<Debtor>[]);
+  const [bills, setBills] = useState([] as Bill[]);
   const auth = useContext(AuthContext);
   const api = useApi();
   useEffect(() => {
@@ -29,10 +31,18 @@ export default function Dashboard() {
     const fetchData = async () => {
       const debtors = await api.findDebtorFromUser();
       setDebtors(debtors);
+      setBills(debtors.map((debtor: Debtor) => debtor.bills).flat());
     };
     if (loading) fetchData();
     setLoading(false);
   }, []);
+
+  const handleGetActiveBills = (): number => {
+    const billsActive = bills.filter((bill) => bill.active === false);
+    return sumBills(billsActive);
+  }
+
+  console.log(bills);
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -69,7 +79,42 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>{" "}
+                  <div className="text-2xl font-bold">
+                    {loading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      priceFormatter(sumBills(bills))
+                    )}
+                  </div>{" "}
+                  {/* bills */}
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Active Bills
+                  </CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {loading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      priceFormatter(handleGetActiveBills())
+                    )}
+                  </div>{" "}
                   {/* bills */}
                 </CardContent>
               </Card>
