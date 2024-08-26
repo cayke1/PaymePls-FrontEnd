@@ -13,4 +13,8 @@ export enum  Events {
     failedToDeleteDebtor = "failedToDeleteDebtor",
     debtorDeleted = "debtorDeleted",
     failedToFetchPayments = "failedToFetchPayments",
+    paymentCreated = "paymentCreated",
+    failedToCreatePayment = "failedToCreatePayment",
+    userRegistered = "userRegistered",
+    failedToRegisterUser = "failedToRegisterUser",
 }

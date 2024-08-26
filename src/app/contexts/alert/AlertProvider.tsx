@@ -61,6 +61,22 @@ const alerts: {[key: string]: any} = {
     icon: "error",
     title: "Falha ao buscar pagamentos",
   },
+  paymentCreated: {
+    icon: "success",
+    title: "Pagamento criado",
+  },
+  failedToCreatePayment: {
+    icon: "error",
+    title: "Falha ao criar pagamento",
+  },
+  userRegistered: {
+    icon: "success",
+    title: "Usuário registrado",
+  },
+  failedToRegisterUser: {
+    icon: "error",
+    title: "Falha ao registrar usuário",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {

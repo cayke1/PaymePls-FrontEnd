@@ -1,8 +1,12 @@
 "use client";
 import { useContext, useEffect } from "react";
-import { z } from "zod";
+import { AlertContext } from "../contexts/alert/AlertContext";
+import { AuthContext } from "../contexts/auth/AuthContext";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Events } from "../contexts/alert/Events.enum";
+import { useRedirect } from "../hooks/useRedirect";
 import {
   Card,
   CardContent,
@@ -11,30 +15,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Events } from "../contexts/alert/Events.enum";
-import { AlertContext } from "../contexts/alert/AlertContext";
-import { AuthContext } from "../contexts/auth/AuthContext";
-import { useRedirect } from "../hooks/useRedirect";
 
-const LoginSchema = z.object({
+const SignupSchema = z.object({
   email: z.string().email(),
   password: z.string(),
+  name: z.string(),
 });
 
-type LoginSchemaType = z.infer<typeof LoginSchema>;
-export default function Login() {
+type SignupSchemaType = z.infer<typeof SignupSchema>;
+export default function Signup() {
   const { getEvent, alertEvent } = useContext(AlertContext);
-  const { to } = useRedirect();
   const auth = useContext(AuthContext);
+  const { to } = useRedirect();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginSchemaType>({
-    resolver: zodResolver(LoginSchema),
+  } = useForm<SignupSchemaType>({
+    resolver: zodResolver(SignupSchema),
   });
 
   useEffect(() => {
@@ -42,64 +43,70 @@ export default function Login() {
     if (event) {
       alertEvent(event);
     }
-  });
+  })
 
-  const onSubmit: SubmitHandler<LoginSchemaType> = async (data) => {
-    const isUserLogged = await auth.signin(data.email, data.password);
-    if (!isUserLogged) {
-      alertEvent(Events.invalidCredentials);
+  const onSubmit: SubmitHandler<SignupSchemaType> = async (data) => {
+    const isUserCreated = await auth.signup(
+      data.name,
+      data.email,
+      data.password
+    );
+    if (!isUserCreated) {
+      alertEvent(Events.failedToRegisterUser);
     }
-    if (isUserLogged) {
+    if (isUserCreated) {
       to("/dashboard");
     }
   };
   return (
     <div className="flex items-center justify-center h-screen">
       <Card className="mx-auto max-w-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Signup</CardTitle>
           <CardDescription>
-            Enter your email and password to login to your account
+            Create your account and start using our services
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label>Email</Label>
                 <Input
-                  id="email"
                   type="email"
-                  placeholder="m@example.com"
-                  required
+                  placeholder="Enter your email"
                   {...register("email")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label>Password</Label>
                 <Input
-                  id="password"
                   type="password"
-                  required
+                  placeholder="Enter your password"
                   {...register("password")}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter your name"
+                  {...register("name")}
+                />
+              </div>
+
               <Button type="submit" className="w-full">
-                Login
+                Signup
               </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col items-center justify-center gap-4 p-2">
+        <CardFooter>
           <p className="text-center text-sm">
-            Don't have an account?{" "}
-            <a href="/signup" className="text-blue-500">
-              Signup
-            </a>
-          </p>
-          <p className="text-center text-sm">
-            <a href="/forgot-password" className="text-blue-500">
-              Forgot password?
+            Already have an account?{" "}
+            <a href="/login" className="text-blue-500">
+              Login
             </a>
           </p>
         </CardFooter>

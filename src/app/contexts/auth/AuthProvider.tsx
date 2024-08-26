@@ -27,6 +27,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const signup = async (email: string, password: string, name: string) => {
+    try {
+      await api.signUp({ email, password, name });
+      signin(email, password);
+      registerEvent(Events.userRegistered);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
   const persistToken = (token: string) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
@@ -71,7 +82,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ signin, checkToken, signout, token }}>
+    <AuthContext.Provider value={{ signin, checkToken, signout, token, signup }}>
       {children}
     </AuthContext.Provider>
   );
