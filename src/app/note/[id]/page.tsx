@@ -63,16 +63,18 @@ export default function Page({ params }: { params: { id: string } }) {
   console.log(payments);
 
   return loading ? (
-    <ScrollArea className="px-4 py-2">
+    <div className="px-4 py-2">
       <div className="h-[100vh] w-full items-center justify-center">
         <div>
           <LoaderCircle className="animate-spin w-full h-[10vh]" />
         </div>
       </div>
-    </ScrollArea>
+    </div>
   ) : (
-    <ScrollArea className="md:px-4 py-2">
-      <div className=" w-full h-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-normal items-center gap-4 flex-wrap mt-10">
+    <div className="md:px-4 py-2 h-[100vh] overflow-y-scroll flex flex-col">
+      <h1 className="text-center text-2xl">Total {priceFormatter(handleCalculateTotal())}</h1>
+      <div className="w-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-center items-center gap-4 flex-wrap mt-10">
+        <h2 className="text-xl">Bills</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -98,12 +100,29 @@ export default function Page({ params }: { params: { id: string } }) {
                 <TableCell>{bill.active ? "Pending" : "Paid"}</TableCell>
               </TableRow>
             ))}
-
-          <TableCaption>
-            Total {priceFormatter(handleCalculateTotal())}
-          </TableCaption>
         </Table>
       </div>
-    </ScrollArea>
+      <div className="w-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-center items-center gap-4 flex-wrap mt-10">
+        <h2 className="text-xl">Payments</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Date</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          {payments.length >= 1 &&
+            payments.map((payment) => (
+              <TableRow>
+                <TableCell>{dateFormatter(payment.created_at)}</TableCell>
+
+                <TableCell className="text-right">
+                  {priceFormatter(payment.value)}
+                </TableCell>
+              </TableRow>
+            ))}
+        </Table>
+      </div>
+    </div>
   );
 }
