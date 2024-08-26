@@ -16,7 +16,6 @@ import { Debtor } from "@/app/@types/debtor";
 import { Bill } from "@/app/@types/bill";
 import { priceFormatter } from "@/app/utils/priceFormatter";
 import { dateFormatter } from "@/app/utils/dateFormatter";
-import { CreateBillModal } from "./components/CreateBillModal";
 import {
   Table,
   TableCaption,
@@ -25,14 +24,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EditBillModal } from "./components/EditBillModal";
+import { CreatePaymentModal } from "./components/CreatePaymentModal";
+import { Payment } from "@/app/@types/payment";
 
-export default function Bills() {
+export default function Payments() {
   const [loading, setLoading] = useState(true);
   const [debtors, setDebtors] = useState([] as Debtor[]);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedDebtor, setSelectedDebtor] = useState<Debtor | null>(null);
-  const [bills, setBills] = useState([] as Bill[]);
+  const [payments, setPayments] = useState([] as Payment[]);
   const api = useApi();
   useEffect(() => {
     setLoading(true);
@@ -41,7 +41,7 @@ export default function Bills() {
       setDebtors(debtors);
     };
     if (loading) fetchData();
-    if (selectedOption) findBills();
+    if (selectedOption) findPayments();
     setLoading(false);
   });
 
@@ -51,9 +51,9 @@ export default function Bills() {
     if (selected) setSelectedDebtor(selected);
   };
 
-  const findBills = async () => {
-    const query_bills = await api.findBillsFromDebtor(selectedOption);
-    setBills(query_bills);
+  const findPayments = async () => {
+    const query_payments = await api.findPaymentsFromDebtor(selectedOption);
+    setPayments(query_payments);
   };
 
   return loading ? (
@@ -90,7 +90,7 @@ export default function Bills() {
             </SelectGroup>
           </SelectContent>
         </Select>
-        <CreateBillModal debtorId={selectedOption} />
+        <CreatePaymentModal debtorId={selectedOption} />
       </div>
 
       <div className="w-full flex justify-normal items-center gap-4 flex-wrap mt-10">
@@ -98,29 +98,17 @@ export default function Bills() {
           <TableCaption>Invoices from {selectedDebtor?.name}</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Date</TableHead>
-              <TableHead className="max-w-[300px]">Description</TableHead>
+              <TableHead className="">Date</TableHead>
               <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
-          {bills.length >= 1 &&
-            bills.map((bill) => (
+          {payments.length >= 1 &&
+            payments.map((payment) => (
               <TableRow>
-                <TableCell>{dateFormatter(bill.created_at)}</TableCell>
-                <TableCell
-                  className="line-clamp-1 max-w-[300px]"
-                  title={bill.description}
-                >
-                  {bill.description}
-                </TableCell>
+                <TableCell>{dateFormatter(payment.created_at)}</TableCell>
                 <TableCell className="text-right">
-                  {priceFormatter(bill.value)}
-                </TableCell>
-                <TableCell>{bill.active ? "Pending" : "Paid"}</TableCell>
-                <TableCell>
-                  <EditBillModal bill={bill}/>
+                  {priceFormatter(payment.value)}
                 </TableCell>
               </TableRow>
             ))}

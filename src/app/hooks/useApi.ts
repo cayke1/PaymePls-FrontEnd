@@ -1,6 +1,7 @@
 import axios from "axios";
 import { User } from "../@types/user";
 import { Bill } from "../@types/bill";
+import { Payment } from "../@types/payment";
 
 let token: string;
 if (typeof window !== "undefined") {
@@ -166,6 +167,57 @@ export const useApi = () => ({
   updateBill: async (billId: string, data: any) => {
     try {
       const response = await api.put(`/bill/${billId}`, data, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
+
+  registerPayment: async (data: Omit<Payment, "created_at">) => {
+    try {
+      const response = await api.post("/payment", data, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
+
+  findPaymentsFromDebtor: async (debtorId: string) => {
+    try {
+      const response = await api.get(`/payment/${debtorId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  deletePayment: async (paymentId: string) => {
+    try {
+      const response = await api.delete(`/payment/${paymentId}`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
+
+  getAllPayments: async () => {
+    try {
+      const response = await api.get("/payment", {
         headers: {
           Authorization: token,
         },

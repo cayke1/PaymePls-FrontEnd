@@ -20,6 +20,12 @@ export const navItems: NavItem[] = [
     label: 'billing'
   },
   {
+    title: 'Payments',
+    href: '/dashboard/payments',
+    icon: 'dollarSign',
+    label: 'payment'
+  },
+  {
     title: 'Logout',
     href: '/logout',
     icon: 'login',

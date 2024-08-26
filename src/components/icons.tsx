@@ -6,6 +6,7 @@ import {
     CircuitBoardIcon,
     Command,
     CreditCard,
+    DollarSign,
     File,
     FileText,
     HelpCircle,
@@ -57,4 +58,5 @@ import {
     sun: SunMedium,
     moon: Moon,
     laptop: Laptop,
+    dollarSign: DollarSign,
   };

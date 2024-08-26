@@ -1,5 +1,6 @@
 "use client";
 import { Bill } from "@/app/@types/bill";
+import { Payment } from "@/app/@types/payment";
 import { AlertContext } from "@/app/contexts/alert/AlertContext";
 import { Events } from "@/app/contexts/alert/Events.enum";
 import { useApi } from "@/app/hooks/useApi";
@@ -20,6 +21,7 @@ import { useContext, useEffect, useState } from "react";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [bills, setBills] = useState([] as Bill[]);
+  const [payments, setPayments] = useState([] as Payment[]);
   const [loading, setLoading] = useState(true);
   const api = useApi();
   const alert = useContext(AlertContext);
@@ -34,6 +36,14 @@ export default function Page({ params }: { params: { id: string } }) {
         alert.alertEvent(Events.failedToFetchBills);
         redirect.to("/login");
       }
+
+      try {
+        const payments = await api.findPaymentsFromDebtor(params.id);
+        setPayments(payments);
+      } catch (error) {
+        console.log("error");
+        alert.alertEvent(Events.failedToFetchPayments);
+      }
     };
     if (loading) fetchData();
     setLoading(false);
@@ -44,8 +54,13 @@ export default function Page({ params }: { params: { id: string } }) {
     bills.forEach((bill) => {
       if (bill.active) total += bill.value;
     });
+    payments.forEach((payment) => {
+      total -= payment.value;
+    });
     return total;
   };
+
+  console.log(payments);
 
   return loading ? (
     <ScrollArea className="px-4 py-2">

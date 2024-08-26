@@ -18,6 +18,11 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <title>
+          PaymePls
+        </title>
+      </head>
       <body className={`${inter.className} overflow-hidden`}>
         <Providers>
           <Toaster />
