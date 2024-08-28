@@ -77,6 +77,14 @@ const alerts: {[key: string]: any} = {
     icon: "error",
     title: "Falha ao registrar usuário",
   },
+  paymentDeleted: {
+    icon: "success",
+    title: "Pagamento excluído",
+  },
+  failedToDeletePayment: {
+    icon: "error",
+    title: "Falha ao excluir pagamento",
+  },
 } as const;
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {

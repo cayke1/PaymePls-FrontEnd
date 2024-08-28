@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { useApi } from "../../hooks/useApi";
-import {LoaderCircle } from "lucide-react";
+import { LoaderCircle, Trash } from "lucide-react";
 import { Debtor } from "@/app/@types/debtor";
 import { Bill } from "@/app/@types/bill";
 import { priceFormatter } from "@/app/utils/priceFormatter";
@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/table";
 import { CreatePaymentModal } from "./components/CreatePaymentModal";
 import { Payment } from "@/app/@types/payment";
+import { Button } from "@/components/ui/button";
+import { ConfirmDeletePaymentModal } from "./components/ConfirmDeletePaymentModal";
 
 export default function Payments() {
   const [loading, setLoading] = useState(true);
@@ -109,6 +111,9 @@ export default function Payments() {
                 <TableCell>{dateFormatter(payment.created_at)}</TableCell>
                 <TableCell className="text-right">
                   {priceFormatter(payment.value)}
+                </TableCell>
+                <TableCell>
+                  <ConfirmDeletePaymentModal id={payment.id!} />
                 </TableCell>
               </TableRow>
             ))}
