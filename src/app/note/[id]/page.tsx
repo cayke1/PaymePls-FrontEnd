@@ -7,10 +7,8 @@ import { useApi } from "@/app/hooks/useApi";
 import { useRedirect } from "@/app/hooks/useRedirect";
 import { dateFormatter } from "@/app/utils/dateFormatter";
 import { priceFormatter } from "@/app/utils/priceFormatter";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -18,6 +16,9 @@ import {
 } from "@/components/ui/table";
 import { LoaderCircle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PageInfoPDF from "./components/PageInfoPDF";
+import { Button } from "@/components/ui/button";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [bills, setBills] = useState([] as Bill[]);
@@ -72,7 +73,27 @@ export default function Page({ params }: { params: { id: string } }) {
     </div>
   ) : (
     <div className="md:px-4 py-2 h-[100vh] overflow-y-scroll flex flex-col">
-      <h1 className="text-center text-2xl">Total {priceFormatter(handleCalculateTotal())}</h1>
+      <h1 className="text-center text-2xl">
+        Total {priceFormatter(handleCalculateTotal())}
+      </h1>
+
+      <Button className="w-min ml-auto">
+        <PDFDownloadLink
+          document={
+            <PageInfoPDF
+              bills={bills}
+              payments={payments}
+              total={priceFormatter(handleCalculateTotal())}
+            />
+          }
+          fileName={`${new Date(Date.now()).toDateString()}.pdf`}
+        >
+          {({ blob, url, loading, error }) =>
+            loading ? "Loading document..." : "Baixar PDF"
+          }
+        </PDFDownloadLink>
+      </Button>
+
       <div className="w-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-center items-center gap-4 flex-wrap mt-10">
         <h2 className="text-xl">Bills</h2>
         <Table>
