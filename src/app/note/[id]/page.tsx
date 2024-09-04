@@ -17,7 +17,7 @@ import {
 import { LoaderCircle } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import PageInfoPDF from "./components/PageInfoPDF";
+import PageInfoPDF from "../../../components/PageInfoPDF";
 import { Button } from "@/components/ui/button";
 
 export default function Page({ params }: { params: { id: string } }) {
