@@ -47,9 +47,9 @@ export default function Signup() {
 
   const onSubmit: SubmitHandler<SignupSchemaType> = async (data) => {
     const isUserCreated = await auth.signup(
-      data.name,
       data.email,
-      data.password
+      data.password,
+      data.name
     );
     if (!isUserCreated) {
       alertEvent(Events.failedToRegisterUser);
