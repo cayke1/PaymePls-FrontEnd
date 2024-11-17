@@ -123,27 +123,29 @@ export default function Page({ params }: { params: { id: string } }) {
             ))}
         </Table>
       </div>
-      <div className="w-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-center items-center gap-4 flex-wrap mt-10">
-        <h2 className="text-xl">Payments</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          {payments.length >= 1 &&
-            payments.map((payment) => (
+      {payments.length >= 1 && (
+        <div className="w-full md:w-[80%] mx-auto border-2 px-1 py-2 flex justify-center items-center gap-4 flex-wrap mt-10">
+          <h2 className="text-xl">Payments</h2>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell>{dateFormatter(payment.created_at)}</TableCell>
-
-                <TableCell className="text-right">
-                  {priceFormatter(payment.value)}
-                </TableCell>
+                <TableHead className="w-[100px]">Date</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
               </TableRow>
-            ))}
-        </Table>
-      </div>
+            </TableHeader>
+            {payments.length >= 1 &&
+              payments.map((payment) => (
+                <TableRow>
+                  <TableCell>{dateFormatter(payment.created_at)}</TableCell>
+
+                  <TableCell className="text-right">
+                    {priceFormatter(payment.value)}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

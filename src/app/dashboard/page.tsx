@@ -20,6 +20,8 @@ import { priceFormatter } from "../utils/priceFormatter";
 import { sumBills } from "../utils/sumBills";
 import { IAllPayments } from "../@types/payment";
 import { sumPayments } from "../utils/sumPayments";
+import { AlertContext } from "../contexts/alert/AlertContext";
+import { Events } from "../contexts/alert/Events.enum";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -27,25 +29,41 @@ export default function Dashboard() {
   const [payments, setPayments] = useState([] as IAllPayments[]);
   const [bills, setBills] = useState([] as Bill[]);
   const auth = useContext(AuthContext);
+  const alert = useContext(AlertContext);
   const api = useApi();
   useEffect(() => {
     setLoading(true);
-    auth.checkToken();
     const fetchData = async () => {
-      const debtors = await api.findDebtorFromUser();
-      const payments = await api.getAllPayments();
-      setPayments(payments);
-      setDebtors(debtors);
-      setBills(debtors.map((debtor: Debtor) => debtor.bills).flat());
+      auth.checkToken();
+      try {
+        const debtors = await api.findDebtorFromUser();
+        setDebtors(debtors);
+        setBills(debtors.map((debtor: Debtor) => debtor.bills).flat());
+      } catch (error) {
+        console.error("Error fetching data", error);
+        setDebtors([]);
+        alert.alertEvent(Events.failedToFetchData);
+      }
+      try {
+        const payments = await api.getAllPayments();
+        setPayments(payments);
+      } catch (error) {
+        console.error("Error fetching data", error);
+        setPayments([]);
+        alert.alertEvent(Events.failedToFetchPayments);
+      } finally {
+        setLoading(false);
+      }
     };
-    if (loading) fetchData();
-    setLoading(false);
+    fetchData();
   }, []);
+
+  console.log("Payments \n\n\n\n  " + payments);
 
   const handleGetActiveBills = (): number => {
     const billsActive = bills.filter((bill) => bill.active === false);
     return sumBills(billsActive);
-  }
+  };
 
   return (
     <ScrollArea className="h-full">
@@ -142,8 +160,10 @@ export default function Dashboard() {
                   <div className="text-2xl font-bold">
                     {loading ? (
                       <LoaderCircle className="animate-spin" />
-                    ) : (
+                    ) : payments.length >= 1 ? (
                       priceFormatter(sumPayments(payments))
+                    ) : (
+                      0
                     )}
                   </div>
                 </CardContent>
